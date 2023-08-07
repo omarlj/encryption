@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multiple Ciphers Encryption/Decryption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 300px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiple Ciphers Encryption/Decryption</h1>
+
+    <!-- Caesar Cipher -->
+    <h2>Caesar Cipher</h2>
+    <label for="caesarPlaintext">Enter Text:</label>
+    <input type="text" id="caesarPlaintext">
+    <label for="caesarKey">Enter Key:</label>
+    <input type="number" id="caesarKey" min="1" max="25">
+    <button onclick="performCaesarEncryption()">Encrypt</button>
+    <button onclick="performCaesarDecryption()">Decrypt</button>
+    <br>
+    <label for="caesarCiphertext">Result:</label>
+    <textarea id="caesarCiphertext" rows="5" cols="40" readonly></textarea>
+
+    <!-- Vigenere Cipher -->
+    <h2>Vigenere Cipher</h2>
+    <label for="vigenerePlaintext">Enter Text:</label>
+    <input type="text" id="vigenerePlaintext">
+    <label for="vigenereKey">Enter Key:</label>
+    <input type="text" id="vigenereKey">
+    <button onclick="performVigenereEncryption()">Encrypt</button>
+    <button onclick="performVigenereDecryption()">Decrypt</button>
+    <br>
+    <label for="vigenereCiphertext">Result:</label>
+    <textarea id="vigenereCiphertext" rows="5" cols="40" readonly></textarea>
+
+    <!-- Vernam Cipher -->
+    <h2>Vernam Cipher</h2>
+    <label for="vernamPlaintext">Enter Text:</label>
+    <input type="text" id="vernamPlaintext">
+    <label for="vernamKey">Enter Key:</label>
+    <input type="text" id="vernamKey">
+    <button onclick="performVernamEncryption()">Encrypt</button>
+    <button onclick="performVernamDecryption()">Decrypt</button>
+    <br>
+    <label for="vernamCiphertext">Result (Binary):</label>
+    <textarea id="vernamCiphertext" rows="5" cols="40" readonly></textarea>
+
+    <!-- Autokey Cipher -->
+    <h2>Autokey Cipher</h2>
+    <label for="autokeyPlaintext">Enter Text:</label>
+    <input type="text" id="autokeyPlaintext">
+    <label for="autokeyKey">Enter Key:</label>
+    <input type="text" id="autokeyKey">
+    <button onclick="performAutokeyEncryption()">Encrypt</button>
+    <button onclick="performAutokeyDecryption()">Decrypt</button>
+    <br>
+    <label for="autokeyCiphertext">Result:</label>
+    <textarea id="autokeyCiphertext" rows="5" cols="40" readonly></textarea>
+
+    <!-- Hill Cipher -->
+    <h2>Hill Cipher (2x2 Matrix)</h2>
+    <label for="hillPlaintext">Enter Text:</label>
+    <input type="text" id="hillPlaintext">
+    <label for="hillKey">Enter Key (4 numbers, comma-separated):</label>
+    <input type="text" id="hillKey">
+    <button onclick="performHillEncryption()">Encrypt</button>
+    <br>
+    <label for="hillCiphertext">Result:</label>
+    <textarea id="hillCiphertext" rows="5" cols="40" readonly></textarea>
+
+    <script>
+        // Caesar Cipher
+        function caesarCipher(text, shift) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char.match(/[A-Z]/)) {
+                    const code = text.charCodeAt(i);
+                    let encryptedCharCode = code + shift;
+                    if (char === char.toUpperCase()) {
+                        if (encryptedCharCode > 90) {
+                            encryptedCharCode -= 26;
+                        }
+                    } else if (char === char.toLowerCase()) {
+                        if (encryptedCharCode > 122) {
+                            encryptedCharCode -= 26;
+                        }
+                    }
+                    result += String.fromCharCode(encryptedCharCode);
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function performCaesarEncryption() {
+            const plaintext = document.getElementById("caesarPlaintext").value.toUpperCase();
+            const shift = parseInt(document.getElementById("caesarKey").value);
+            const ciphertext = caesarCipher(plaintext, shift);
+            document.getElementById("caesarCiphertext").value = ciphertext;
+        }
+
+        function performCaesarDecryption() {
+            const ciphertext = document.getElementById("caesarCiphertext").value.toUpperCase();
+            const shift = parseInt(document.getElementById("caesarKey").value);
+            const plaintext = caesarCipher(ciphertext, -shift);
+            document.getElementById("caesarPlaintext").value = plaintext;
+        }
+
+        // Vigenere Cipher
+        function vigenereCipher(plaintext, key, isEncrypt) {
+            let result = '';
+            const keyLength = key.length;
+            for (let i = 0; i < plaintext.length; i++) {
+                const char = plaintext[i];
+                const keyChar = key[i % keyLength];
+                if (char.match(/[A-Z]/)) {
+                    const code = char.charCodeAt(0);
+                    const keyCharCode = keyChar.toUpperCase().charCodeAt(0);
+                    let encryptedCharCode;
+                    if (isEncrypt) {
+                        encryptedCharCode = (code + keyCharCode) % 26;
+                    } else {
+                        encryptedCharCode = (code - keyCharCode + 26) % 26;
+                    }
+                    result += String.fromCharCode(encryptedCharCode + 65);
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function performVigenereEncryption() {
+            const plaintext = document.getElementById("vigenerePlaintext").value.toUpperCase();
+            const key = document.getElementById("vigenereKey").value.toUpperCase();
+            const ciphertext = vigenereCipher(plaintext, key, true);
+            document.getElementById("vigenereCiphertext").value = ciphertext;
+        }
+
+        function performVigenereDecryption() {
+            const ciphertext = document.getElementById("vigenereCiphertext").value.toUpperCase();
+            const key = document.getElementById("vigenereKey").value.toUpperCase();
+            const plaintext = vigenereCipher(ciphertext, key, false);
+            document.getElementById("vigenerePlaintext").value = plaintext;
+        }
+
+        // Vernam Cipher
+        function vernamCipher(plaintext, key) {
+            let result = '';
+            for (let i = 0; i < plaintext.length; i++) {
+                const char = plaintext[i];
+                if (char.match(/[A-Z]/)) {
+                    const code = char.charCodeAt(0);
+                    const keyCharCode = key[i % key.length].toUpperCase().charCodeAt(0);
+                    const encryptedCharCode = (code ^ keyCharCode) % 26;
+                    result += String.fromCharCode(encryptedCharCode + 65);
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function performVernamEncryption() {
+            const plaintext = document.getElementById("vernamPlaintext").value.toUpperCase();
+            const key = document.getElementById("vernamKey").value.toUpperCase();
+            const ciphertext = vernamCipher(plaintext, key);
+            document.getElementById("vernamCiphertext").value = ciphertext;
+        }
+
+        function performVernamDecryption() {
+            // Vernam decryption is the same as encryption (symmetric operation)
+            performVernamEncryption();
+        }
+
+        // Autokey Cipher
+        function autokeyCipher(plaintext, key, isEncrypt) {
+            let result = '';
+            const keyLength = key.length;
+            let keyIndex = 0;
+            for (let i = 0; i < plaintext.length; i++) {
+                const char = plaintext[i];
+                const keyChar = key[keyIndex];
+                if (char.match(/[A-Z]/)) {
+                    const code = char.charCodeAt(0);
+                    const keyCharCode = keyChar.toUpperCase().charCodeAt(0);
+                    let encryptedCharCode;
+                    if (isEncrypt) {
+                        encryptedCharCode = (code + keyCharCode) % 26;
+                    } else {
+                        encryptedCharCode = (code - keyCharCode + 26) % 26;
+                    }
+                    result += String.fromCharCode(encryptedCharCode + 65);
+                    if (isEncrypt) {
+                        keyIndex = (keyIndex + 1) % keyLength;
+                    }
+                } else {
+                    result += char;
+                }
+            }
+            return result;
+        }
+
+        function performAutokeyEncryption() {
+            const plaintext = document.getElementById("autokeyPlaintext").value.toUpperCase();
+            const key = document.getElementById("autokeyKey").value.toUpperCase();
+            const ciphertext = autokeyCipher(plaintext, key, true);
+            document.getElementById("autokeyCiphertext").value = ciphertext;
+        }
+
+        function performAutokeyDecryption() {
+            const ciphertext = document.getElementById("autokeyCiphertext").value.toUpperCase();
+            const key = document.getElementById("autokeyKey").value.toUpperCase();
+            const plaintext = autokeyCipher(ciphertext, key, false);
+            document.getElementById("autokeyPlaintext").value = plaintext;
+        }
+
+        // Hill Cipher
+        function parseHillKey(key) {
+            const numbers = key.split(',').map(Number);
+            if (numbers.length !== 4 || numbers.some(isNaN)) {
+                return null;
+            }
+            return [
+                [numbers[0], numbers[1]],
+                [numbers[2], numbers[3]]
+            ];
+        }
+
+        function hillCipherEncryption(plaintext, keyMatrix) {
+            let result = '';
+            for (let i = 0; i < plaintext.length; i += 2) {
+                const block = plaintext.slice(i, i + 2);
+                if (block.length === 1) {
+                    block += 'X';
+                }
+                const charCodes = block.split('').map(char => char.charCodeAt(0) - 65);
+                const encryptedCodes = [
+                    charCodes[0] * keyMatrix[0][0] + charCodes[1] * keyMatrix[0][1],
+                    charCodes[0] * keyMatrix[1][0] + charCodes[1] * keyMatrix[1][1]
+                ];
+                result += String.fromCharCode((encryptedCodes[0] % 26) + 65);
+                result += String.fromCharCode((encryptedCodes[1] % 26) + 65);
+            }
+            return result;
+        }
+
+        function performHillEncryption() {
+            const plaintext = document.getElementById("hillPlaintext").value.toUpperCase();
+            const key = document.getElementById("hillKey").value;
+            const keyMatrix = parseHillKey(key);
+            if (!keyMatrix) {
+                alert("Invalid Hill key. Please enter 4 valid numbers.");
+                return;
+            }
+            const ciphertext = hillCipherEncryption(plaintext, keyMatrix);
+            document.getElementById("hillCiphertext").value = ciphertext;
+        }
+
+        // ... Other functions for decryption ...
+
+    </script>
+</body>
+</html>
+
